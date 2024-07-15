@@ -1,0 +1,16 @@
+pragma solidity ^0.8.0;
+
+// Import the ZoKrates verifier contract
+import "./Verifier.sol";
+
+contract ZeroKnowledgeProof {
+    Verifier private verifierContract;
+
+    constructor(address _verifierAddress) {
+        verifierContract = Verifier(_verifierAddress);
+    }
+
+    function verifyProof(uint256[2] memory a, uint256[2][2] memory b, uint256[2] memory c, uint256[5] memory input) public view returns (bool) {
+        return verifierContract.verifyTx(a, b, c, input);
+    }
+}

@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SupplyChainTracking {
+    struct Product {
+        uint256 productId;
+        address producer;
+        address distributor;
+        address retailer;
+        bool isProduced;
+        bool isDistributed;
+        bool isSold;
+    }
+
+    mapping(uint256 => Product) public products;
+    uint256 public productCount;
+
+    event ProductProduced(uint256 productId, address producer);
+    event ProductDistributed(uint256 productId, address distributor);
+    event ProductSold(uint256 productId, address retailer);
+
+    function produceProduct() public {
+        productCount++;
+        products[productCount] = Product(productCount, msg.sender, address(0), address(0), true, false, false);
+        emit ProductProduced(productCount, msg.sender);
+    }
+
+    function distributeProduct(uint256 productId, address distributor) public {
+        require(products[productId].isProduced, "Product has not been produced yet");
+        products[productId].distributor = distributor;
+        products[productId].isDistributed = true;
+        emit ProductDistributed(productId, distributor);
+    }
+
+    function sellProduct(uint256 productId, address retailer) public {
+        require(products[productId].isDistributed, "Product has not been distributed yet");
+        require(msg.sender == products[productId].retailer, "Only the retailer can sell the product");
+        products[productId].retailer = retailer;
+        products[productId].isSold = true;
+        emit ProductSold(productId, retailer);
+    }
+}
